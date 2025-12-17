@@ -1,0 +1,108 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('commande', function (Blueprint $table) {
+            $table->foreign('IDTABLE', 'FK_COMMANDE_TABLE')
+                  ->references('IDTABLE')
+                  ->on('gestion_salle')
+                  ->onDelete('restrict')
+                  ->onUpdate('cascade');
+            
+            $table->foreign('IDCLIENT', 'FK_COMMANDE_CLIENT')
+                  ->references('IDCLIENT')
+                  ->on('client')
+                  ->onDelete('restrict')
+                  ->onUpdate('cascade');
+        });
+
+        Schema::table('composer', function (Blueprint $table) {
+            $table->foreign('IDPLATS', 'FK_COMPOSER_PLATS')
+                  ->references('IDPLATS')
+                  ->on('plats')
+                  ->onDelete('restrict')
+                  ->onUpdate('cascade');
+            
+            $table->foreign('IDCOMMANDE', 'FK_COMPOSER_COMMANDE')
+                  ->references('IDCOMMANDE')
+                  ->on('commande')
+                  ->onDelete('cascade')
+                  ->onUpdate('cascade');
+        });
+
+        Schema::table('contenir', function (Blueprint $table) {
+            $table->foreign('IDBOISSONS', 'FK_CONTENIR_BOISSONS')
+                  ->references('IDBOISSONS')
+                  ->on('boissons')
+                  ->onDelete('restrict')
+                  ->onUpdate('cascade');
+            
+            $table->foreign('IDCOMMANDE', 'FK_CONTENIR_COMMANDE')
+                  ->references('IDCOMMANDE')
+                  ->on('commande')
+                  ->onDelete('cascade')
+                  ->onUpdate('cascade');
+        });
+
+        Schema::table('horaire_reservation', function (Blueprint $table) {
+            $table->foreign('idTable', 'FK_HORAIRE_RESERVATION_TABLE')
+                  ->references('idTable')
+                  ->on('gestion_salle')
+                  ->onDelete('set null')
+                  ->onUpdate('cascade');
+            
+            $table->foreign('idClient', 'FK_HORAIRE_RESERVATION_CLIENT')
+                  ->references('idClient')
+                  ->on('client')
+                  ->onDelete('cascade')
+                  ->onUpdate('cascade');
+        });
+
+        Schema::table('ticket', function (Blueprint $table) {
+            $table->foreign('IDCOMMANDE', 'FK_TICKET_COMMANDE')
+                  ->references('IDCOMMANDE')
+                  ->on('commande')
+                  ->onDelete('cascade')
+                  ->onUpdate('cascade');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('ticket', function (Blueprint $table) {
+            $table->dropForeign('FK_TICKET_COMMANDE');
+        });
+
+        Schema::table('horaire_reservation', function (Blueprint $table) {
+            $table->dropForeign('FK_HORAIRE_RESERVATION_TABLE');
+            $table->dropForeign('FK_HORAIRE_RESERVATION_CLIENT');
+        });
+
+        Schema::table('contenir', function (Blueprint $table) {
+            $table->dropForeign('FK_CONTENIR_BOISSONS');
+            $table->dropForeign('FK_CONTENIR_COMMANDE');
+        });
+
+        Schema::table('composer', function (Blueprint $table) {
+            $table->dropForeign('FK_COMPOSER_PLATS');
+            $table->dropForeign('FK_COMPOSER_COMMANDE');
+        });
+
+        Schema::table('commande', function (Blueprint $table) {
+            $table->dropForeign('FK_COMMANDE_TABLE');
+            $table->dropForeign('FK_COMMANDE_CLIENT');
+        });
+    }
+};
