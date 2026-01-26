@@ -10,6 +10,7 @@ use App\Models\HoraireReservation;
 use App\Models\Ticket;
 use App\Models\Plat;
 use App\Models\Boisson;
+use App\Models\GestionSalle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -55,6 +56,9 @@ class DashboardController extends Controller
             'boissons' => Boisson::where('quantite', '<', 10)->get(),
         ];
 
+        // État des tables
+        $tables = GestionSalle::orderBy('numero')->get();
+
         // Statistiques par période (7 derniers jours)
         $statsParJour = [];
         for ($i = 6; $i >= 0; $i--) {
@@ -71,7 +75,8 @@ class DashboardController extends Controller
             'dernieresCommandes',
             'dernieresReservations',
            'alertesStock',
-            'statsParJour'
+            'statsParJour',
+            'tables'
         ));
     }
 }

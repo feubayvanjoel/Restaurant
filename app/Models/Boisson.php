@@ -12,7 +12,7 @@ class Boisson extends Model
     protected $table = 'boissons';
     protected $primaryKey = 'IDBOISSONS';
     public $timestamps = false;
-    
+
     protected $fillable = [
         'nom',
         'prix',
@@ -26,6 +26,11 @@ class Boisson extends Model
     ];
 
     // --- Accessors (Lecture) ---
+    public function getIdBoissonsAttribute($value)
+    {
+        return $this->attributes['IDBOISSONS'] ?? $this->attributes['idBoissons'] ?? $value;
+    }
+
     public function getNomAttribute($value)
     {
         return $this->attributes['nom'] ?? $this->attributes['NOM'] ?? $value;
@@ -45,18 +50,15 @@ class Boisson extends Model
     public function setNomAttribute($value)
     {
         $this->attributes['NOM'] = $value;
-        $this->attributes['nom'] = $value;
     }
 
     public function setPrixAttribute($value)
     {
         $this->attributes['PRIX'] = $value;
-        $this->attributes['prix'] = $value;
     }
 
     public function setQuantiteAttribute($value)
     {
         $this->attributes['QUANTITE'] = $value;
-        $this->attributes['quantite'] = $value;
     }
 }

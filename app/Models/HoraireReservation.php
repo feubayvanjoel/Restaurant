@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class HoraireReservation extends Model
 {
     protected $table = 'horaire_reservation';
-    protected $primaryKey = 'IDHORAIRERESERVATION';
+    protected $primaryKey = 'idHoraireReservation';
     public $timestamps = false;
 
     protected $fillable = [

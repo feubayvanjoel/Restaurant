@@ -15,10 +15,41 @@ class Composer extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'idCommande',
-        'idPlats',
-        'quantite',
+        'IDCOMMANDE',
+        'IDPLATS',
+        'NBPLATS',
     ];
+
+    // Accesseurs pour mapper les noms camelCase aux noms UPPERCASE
+    public function setIdCommandeAttribute($value)
+    {
+        $this->attributes['IDCOMMANDE'] = $value;
+    }
+
+    public function getIdCommandeAttribute()
+    {
+        return $this->attributes['IDCOMMANDE'] ?? null;
+    }
+
+    public function setIdPlatsAttribute($value)
+    {
+        $this->attributes['IDPLATS'] = $value;
+    }
+
+    public function getIdPlatsAttribute()
+    {
+        return $this->attributes['IDPLATS'] ?? null;
+    }
+
+    public function setQuantiteAttribute($value)
+    {
+        $this->attributes['NBPLATS'] = $value;
+    }
+
+    public function getQuantiteAttribute()
+    {
+        return $this->attributes['NBPLATS'] ?? null;
+    }
 
     public function commande(): BelongsTo
     {

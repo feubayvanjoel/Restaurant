@@ -15,16 +15,19 @@ class Commande extends Model
     protected $table = 'commande';
     protected $primaryKey = 'IDCOMMANDE';
     public $timestamps = false;
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'idTable',
-        'idClient',
-        'horaire',
-        'statut',
+        'IDTABLE',
+        'IDCLIENT',
+        'HORAIRE',
+        'STATUT',
+        'NB_PERSONNES',
     ];
 
     protected $casts = [
-        'horaire' => 'datetime',
+        'HORAIRE' => 'datetime',
     ];
 
     public function table(): BelongsTo
@@ -39,20 +42,30 @@ class Commande extends Model
 
     public function ticket(): HasOne
     {
-        return $this->hasOne(Ticket::class, 'idCommande', 'idCommande');
+        return $this->hasOne(Ticket::class, 'IDCOMMANDE', 'IDCOMMANDE');
     }
 
     public function composer(): HasMany
     {
-        return $this->hasMany(Composer::class, 'idCommande', 'idCommande');
+        return $this->hasMany(Composer::class, 'IDCOMMANDE', 'IDCOMMANDE');
     }
 
     public function contenir(): HasMany
     {
-        return $this->hasMany(Contenir::class, 'idCommande', 'idCommande');
+        return $this->hasMany(Contenir::class, 'IDCOMMANDE', 'IDCOMMANDE');
     }
 
     // Accessors for case-insensitive handling
+    public function getIdCommandeAttribute($value)
+    {
+        return $this->attributes['idcommande'] ?? $this->attributes['IDCOMMANDE'] ?? $value;
+    }
+
+    public function getIdClientAttribute($value)
+    {
+        return $this->attributes['idclient'] ?? $this->attributes['IDCLIENT'] ?? $value;
+    }
+
     public function getHoraireAttribute($value)
     {
         return $this->attributes['horaire'] ?? $this->attributes['HORAIRE'] ?? $value;

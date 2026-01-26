@@ -141,12 +141,32 @@ Alpine.data('menuManager', () => ({
 
     addToCart(item) {
         console.log('Adding to cart:', item);
-        const existing = this.cart.find(i => i.id === item.id && i.type === item.type);
+        // Vérifier que l'item a un ID
+        if (!item.id) {
+            console.error('Item missing ID:', item);
+            if (globalThis.toast) globalThis.toast('Erreur: produit invalide', 'error');
+            return;
+        }
+
+        // Ensure prix is a number
+        item.prix = parseFloat(item.prix);
+
+        // Chercher un produit identique (même ID ET même type)
+        const existing = this.cart.find(i => {
+            const isSameId = i.id === item.id;
+            const isSameType = i.type === item.type;
+            console.log(`Comparing: id=${i.id} vs ${item.id} (${isSameId}), type=${i.type} vs ${item.type} (${isSameType})`);
+            return isSameId && isSameType;
+        });
+
         if (existing) {
+            console.log('Product already in cart, incrementing quantity');
             existing.quantite++;
         } else {
-            this.cart.push({...item, quantite: 1});
+            console.log('Adding new product to cart');
+            this.cart.push({ ...item, quantite: 1 });
         }
+        console.log('Cart updated:', this.cart);
         if (globalThis.toast) globalThis.toast('Ajouté au panier', 'success');
     },
 
@@ -172,7 +192,10 @@ Alpine.data('menuManager', () => ({
             return;
         }
         sessionStorage.setItem('cart', JSON.stringify(this.cart));
-        location.href = '/client/commandes/create';
+        // Use relative URL to work in subdirectory installations
+        const currentPath = window.location.pathname;
+        const basePath = currentPath.substring(0, currentPath.indexOf('/client'));
+        location.href = basePath + '/client/commandes/create';
     }
 }));
 
@@ -186,13 +209,33 @@ window.menuManager = () => ({
     showCart: false,
 
     addToCart(item) {
-        console.log('Adding to cart:', item);
-        const existing = this.cart.find(i => i.id === item.id && i.type === item.type);
+        console.log('Adding to cart (fallback):', item);
+        // Vérifier que l'item a un ID
+        if (!item.id) {
+            console.error('Item missing ID:', item);
+            if (window.toast) window.toast('Erreur: produit invalide', 'error');
+            return;
+        }
+
+        // Ensure prix is a number
+        item.prix = parseFloat(item.prix);
+
+        // Chercher un produit identique (même ID ET même type)
+        const existing = this.cart.find(i => {
+            const isSameId = i.id === item.id;
+            const isSameType = i.type === item.type;
+            console.log(`Comparing: id=${i.id} vs ${item.id} (${isSameId}), type=${i.type} vs ${item.type} (${isSameType})`);
+            return isSameId && isSameType;
+        });
+
         if (existing) {
+            console.log('Product already in cart, incrementing quantity');
             existing.quantite++;
         } else {
-            this.cart.push({...item, quantite: 1});
+            console.log('Adding new product to cart');
+            this.cart.push({ ...item, quantite: 1 });
         }
+        console.log('Cart updated:', this.cart);
         if (window.toast) window.toast('Ajouté au panier', 'success');
     },
 
@@ -218,7 +261,10 @@ window.menuManager = () => ({
             return;
         }
         sessionStorage.setItem('cart', JSON.stringify(this.cart));
-        location.href = '/client/commandes/create';
+        // Use relative URL to work in subdirectory installations
+        const currentPath = window.location.pathname;
+        const basePath = currentPath.substring(0, currentPath.indexOf('/client'));
+        location.href = basePath + '/client/commandes/create';
     }
 });
 

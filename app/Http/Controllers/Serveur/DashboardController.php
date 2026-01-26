@@ -22,13 +22,13 @@ class DashboardController extends Controller
         $tables = RestaurantTable::orderBy('numero')->get();
 
         // Commandes prêtes à servir
-        $commandesPrete = Commande::where('statut', 'Prete')
+        $commandesPrete = Commande::where('statut', 'Préparée')
             ->with(['client', 'table', 'composer.plat', 'contenir.boisson'])
             ->orderBy('horaire', 'asc')
             ->get();
 
         // Commandes en cours de service
-        $commandesEnCours = Commande::where('statut', 'En cours')
+        $commandesEnCours = Commande::where('statut', 'Servie')
             ->with(['client', 'table', 'composer.plat', 'contenir.boisson'])
             ->orderBy('horaire', 'asc')
             ->get();

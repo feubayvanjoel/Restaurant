@@ -10,7 +10,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             font-size: 12px;
@@ -18,37 +18,37 @@
             color: #333;
             padding: 20px;
         }
-        
+
         .ticket {
             max-width: 800px;
             margin: 0 auto;
             border: 2px solid #000;
             padding: 30px;
         }
-        
+
         .header {
             text-align: center;
             margin-bottom: 30px;
             border-bottom: 2px solid #000;
             padding-bottom: 20px;
         }
-        
+
         .restaurant-name {
             font-size: 28px;
             font-weight: bold;
             margin-bottom: 5px;
         }
-        
+
         .ticket-title {
             font-size: 18px;
             font-weight: bold;
             margin-top: 10px;
         }
-        
+
         .section {
             margin-bottom: 20px;
         }
-        
+
         .section-title {
             font-size: 14px;
             font-weight: bold;
@@ -56,60 +56,60 @@
             padding: 5px;
             background-color: #f0f0f0;
         }
-        
+
         .info-grid {
             display: table;
             width: 100%;
             margin-bottom: 15px;
         }
-        
+
         .info-row {
             display: table-row;
         }
-        
+
         .info-label {
             display: table-cell;
             width: 40%;
             font-weight: bold;
             padding: 5px 0;
         }
-        
+
         .info-value {
             display: table-cell;
             padding: 5px 0;
         }
-        
+
         .items-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
         }
-        
+
         .items-table thead {
             background-color: #f0f0f0;
         }
-        
+
         .items-table th,
         .items-table td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
-        
+
         .items-table th {
             font-weight: bold;
         }
-        
+
         .text-right {
             text-align: right;
         }
-        
+
         .total-section {
             margin-top: 20px;
             border-top: 2px solid #000;
             padding-top: 15px;
         }
-        
+
         .total-row {
             display: flex;
             justify-content: space-between;
@@ -117,7 +117,7 @@
             font-weight: bold;
             margin-top: 10px;
         }
-        
+
         .footer {
             margin-top: 30px;
             text-align: center;
@@ -125,7 +125,7 @@
             border-top: 1px dashed #000;
             padding-top: 15px;
         }
-        
+
         .status-badge {
             display: inline-block;
             padding: 3px 10px;
@@ -133,17 +133,17 @@
             font-size: 11px;
             font-weight: bold;
         }
-        
+
         .status-en-attente {
             background-color: #ffd700;
             color: #000;
         }
-        
+
         .status-en-cours {
             background-color: #87ceeb;
             color: #000;
         }
-        
+
         .status-terminee {
             background-color: #90ee90;
             color: #000;
@@ -154,9 +154,12 @@
     <div class="ticket">
         <!-- En-tête -->
         <div class="header">
-            <div class="restaurant-name">🍽️ RESTAURANT</div>
-            <div>Adresse du restaurant</div>
-            <div>Téléphone: +32 XXX XX XX XX</div>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <img src="{{ public_path('logo.png') }}" alt="Joel Restau Logo" style="height: 50px; display: inline-block;">
+            </div>
+            <div class="restaurant-name">Joel Restau</div>
+            <div>Mons, Belgique</div>
+            <div>Téléphone: +32 465 19 14 69</div>
             <div class="ticket-title">TICKET DE CAISSE</div>
         </div>
 
@@ -264,7 +267,7 @@
         <!-- Pied de page -->
         <div class="footer">
             <p>Merci de votre visite !</p>
-            <p>TVA BE XXXXXXXXX</p>
+            <p>TVA FR 12 345 678 901</p>
             <p>Document généré le {{ now()->format('d/m/Y à H:i') }}</p>
         </div>
     </div>

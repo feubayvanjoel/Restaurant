@@ -38,7 +38,12 @@
                 <div class="mb-4">
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-sm text-gray-700"><strong>Table:</strong></p>
-                        <p class="text-lg font-bold text-primary-600">{{ $commande->table->numero ?? 'N/A' }}</p>
+                        <p class="text-lg font-bold text-primary-600">
+                            {{ $commande->table->numero ?? 'N/A' }} 
+                            <span class="text-xs font-normal text-gray-500">
+                                (Cap: {{ $commande->table->capacite }} | Occ: {{ $commande->table->occupants }})
+                            </span>
+                        </p>
                     </div>
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-sm text-gray-700"><strong>Client:</strong></p>

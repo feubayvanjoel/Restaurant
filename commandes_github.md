@@ -1,0 +1,19 @@
+## Commandes github
+
+1- Initialisation du depot Git...
+- `git init`
+
+2- Ajout des fichiers...
+- `git add .`
+
+3- Creation du commit...
+- `git commit -m "Initial commit: Projet complet Backend + Frontend"`
+
+4- Renommage de la branche principale en 'main'...
+- `git branch -M main`
+
+5- Ajout de l'origine distante...
+- `git remote add origin https://github.com/feubayvanjoel/Restaurant.git`
+
+6- Envoi vers GitHub...
+- `git push -u origin main`

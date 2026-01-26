@@ -17,8 +17,14 @@ class EncaissementController extends Controller
      */
     public function index()
     {
-        $commandesAEncaisser = Commande::where('statut', 'Servie')
+        $commandesAEncaisser = Commande::whereIn('STATUT', ['Servie', 'En attente paiement', 'Terminée']) // Terminée shows up normally until paid? Actually "Terminée" was used as "Paid" in old logic?
+            // "Terminée" in current logic means "Client finished eating".
+            // "Payée" means Paid.
+            // So Caissier sees "Servie" (ready to pay), "En attente paiement" (requested), or "Terminée" (finished eating, ready to pay)
+            ->where('STATUT', '!=', 'Payée')
+            ->where('STATUT', '!=', 'Annulee')
             ->with(['client', 'table', 'ticket', 'composer.plat', 'contenir.boisson'])
+            ->orderByRaw("FIELD(STATUT, 'En attente paiement', 'Terminée', 'Servie')") // Priority to requests
             ->orderBy('horaire', 'asc')
             ->get();
 
@@ -62,6 +68,24 @@ class EncaissementController extends Controller
 
         return redirect()->route('caissier.dashboard')
             ->with('success', 'Encaissement effectué avec succès !');
+        return redirect()->route('caissier.dashboard')
+            ->with('success', 'Encaissement effectué avec succès !');
+    }
+
+    /**
+     * Valider un paiement en espèces demandé par le client
+     */
+    public function validatePayment(Commande $commande, Request $request)
+    {
+        if ($commande->statut !== 'En attente paiement') {
+            return back()->withErrors(['error' => 'Statut incorrect pour validation.']);
+        }
+
+        $commande->update(['STATUT' => 'Payée']);
+
+        // Optionnel : libérer table ? Non.
+
+        return back()->with('success', 'Paiement en espèces validé pour la commande #' . $commande->idCommande);
     }
 
     /**

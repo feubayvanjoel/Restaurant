@@ -19,8 +19,11 @@ class DashboardController extends Controller
     public function index()
     {
         // Commandes servies en attente de paiement
-        $commandesAEncaisser = Commande::where('statut', 'Servie')
+        $commandesAEncaisser = Commande::whereIn('STATUT', ['Servie', 'En attente paiement', 'Terminée'])
+            ->where('STATUT', '!=', 'Payée')
+            ->where('STATUT', '!=', 'Annulee')
             ->with(['client', 'table', 'ticket'])
+            ->orderByRaw("FIELD(STATUT, 'En attente paiement', 'Terminée', 'Servie')") // Priority to requests
             ->orderBy('horaire', 'asc')
             ->get();
 

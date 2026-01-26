@@ -113,7 +113,7 @@ Avant de commencer, assurez-vous d'avoir installé :
 
 ```bash
 cd c:\xampp\htdocs
-git clone https://github.com/feubayvanjoel/Restaurant.git
+git clone <repository-url> restaurant
 cd restaurant
 ```
 

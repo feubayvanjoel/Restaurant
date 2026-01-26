@@ -3,6 +3,7 @@
 @section('title', 'Caisse - Dashboard')
 
 @section('content')
+<div id="caissier-dashboard-content">
 <div class="mb-6">
     <div class="flex justify-between items-center">
         <div>
@@ -92,15 +93,27 @@
                     <div class="flex justify-between items-start mb-2">
                         <div>
                             <h3 class="font-bold text-lg">Commande #{{ $commande->idCommande }}</h3>
-                            <p class="text-sm text-gray-600">Table {{ $commande->table->numero ?? 'N/A' }}</p>
+                            <p class="text-sm text-gray-600">
+                                Table {{ $commande->table->numero ?? 'N/A' }} 
+                                ({{ $commande->table->capacite ?? '?' }}p | Occ: {{ $commande->table->occupants }})
+                            </p>
                             <p class="text-sm text-gray-600">{{ $commande->client?->nom ?? 'Inconnu' }} {{ $commande->client?->prenom }}</p>
                         </div>
                         <span class="text-xl font-bold text-primary-600">{{ number_format($commande->ticket->prix ?? 0, 2) }} €</span>
                     </div>
 
-                    <a href="{{ route('caissier.encaissements.show', $commande) }}" class="btn btn-primary btn-sm w-full mt-2">
-                        💳 Encaisser
-                    </a>
+                    @if($commande->statut === 'En attente paiement')
+                        <form action="{{ route('caissier.encaissements.validate', $commande) }}" method="POST" onsubmit="return confirm('Valider le paiement en espèces pour {{ number_format($commande->ticket->prix, 2) }} € ?');">
+                            @csrf
+                            <button type="submit" class="w-full py-3 px-4 bg-green-50 border-2 border-green-500 text-green-700 font-bold rounded hover:bg-green-100 transition flex items-center justify-center gap-2">
+                                ✅ Valider Paiement (Espèces)
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('caissier.encaissements.show', $commande) }}" class="btn btn-primary btn-sm w-full mt-2">
+                            💳 Encaisser
+                        </a>
+                    @endif
                 </div>
             @empty
                 <p class="text-gray-500 text-center py-8">Aucune commande à encaisser</p>
@@ -131,5 +144,28 @@
             @endforelse
         </div>
     </div>
+    </div>
 </div>
+</div> {{-- Close Wrapper --}}
+
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dashboardContent = document.getElementById('caissier-dashboard-content');
+        
+        setInterval(() => {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.getElementById('caissier-dashboard-content').innerHTML;
+                    dashboardContent.innerHTML = newContent;
+                })
+                .catch(err => console.error('Erreur refresh caissier:', err));
+        }, 2000);
+    });
+</script>
 @endsection

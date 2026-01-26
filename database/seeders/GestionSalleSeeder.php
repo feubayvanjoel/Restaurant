@@ -14,8 +14,11 @@ class GestionSalleSeeder extends Seeder
     {
         $tables = [];
         for ($i = 1; $i <= 20; $i++) {
-            $statut = ($i == 2 || $i == 5) ? 'Occupee' : 'Libre';
-            $tables[] = ['NUMERO' => $i, 'STATUT' => $statut];
+            $tables[] = [
+                'NUMERO' => $i,
+                'STATUT' => 'Libre',
+                'CAPACITE' => rand(2, 8)
+            ];
         }
         \DB::table('gestion_salle')->insert($tables);
     }

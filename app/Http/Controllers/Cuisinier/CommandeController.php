@@ -21,9 +21,9 @@ class CommandeController extends Controller
             return back()->withErrors(['error' => 'Cette commande n\'est pas en attente.']);
         }
 
-        $commande->update(['statut' => 'En cours']);
+        $commande->update(['STATUT' => 'En préparation']);
 
-        return back()->with('success', 'Préparation démarrée !');
+        return back()->with('success', 'Préparation démarrée ! Commande déplacée dans "En Préparation"');
     }
 
     /**
@@ -31,11 +31,11 @@ class CommandeController extends Controller
      */
     public function markAsReady(Commande $commande)
     {
-        if ($commande->statut !== 'En cours') {
+        if ($commande->statut !== 'En préparation') {
             return back()->withErrors(['error' => 'Cette commande n\'est pas en cours de préparation.']);
         }
 
-        $commande->update(['statut' => 'Prete']);
+        $commande->update(['STATUT' => 'Préparée']);
 
         return back()->with('success', 'Commande prête à servir !');
     }
@@ -60,12 +60,12 @@ class CommandeController extends Controller
             ->orderBy('horaire', 'asc')
             ->get();
 
-        $commandesEnCours = Commande::where('statut', 'En cours')
+        $commandesEnCours = Commande::where('statut', 'En préparation')
             ->with(['client', 'table', 'composer.plat', 'contenir.boisson'])
             ->orderBy('horaire', 'asc')
             ->get();
 
-        $commandesPrete = Commande::where('statut', 'Prete')
+        $commandesPrete = Commande::where('statut', 'Préparée')
             ->with(['client', 'table', 'composer.plat', 'contenir.boisson'])
             ->orderBy('horaire', 'asc')
             ->limit(10)

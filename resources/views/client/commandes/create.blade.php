@@ -20,7 +20,7 @@
 <div x-data="{
     cart: [],
     selectedTable: '',
-    
+
     init() {
         // Récupérer le panier depuis sessionStorage
         const savedCart = sessionStorage.getItem('cart');
@@ -28,7 +28,7 @@
             this.cart = JSON.parse(savedCart);
         }
     },
-    
+
     updateQuantity(index, delta) {
         this.cart[index].quantite += delta;
         if (this.cart[index].quantite <= 0) {
@@ -36,17 +36,31 @@
         }
         sessionStorage.setItem('cart', JSON.stringify(this.cart));
     },
-    
+
     getTotal() {
         return this.cart.reduce((sum, item) => sum + (item.prix * item.quantite), 0);
+    },
+
+    // Capacités des tables (injecté par Blade)
+    tableCapacities: {
+        @foreach($tables as $t)
+            {{ $t->idTable }}: {{ $t->capacite }},
+        @endforeach
+    },
+    nbPersonnes: 1,
+
+    get isCapacityValid() {
+        if (!this.selectedTable) return true; 
+        const max = this.tableCapacities[this.selectedTable] || 999;
+        return parseInt(this.nbPersonnes) <= max;
     }
 }" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    
+
     <!-- Récapitulatif de la commande -->
     <div class="lg:col-span-2">
         <div class="card">
             <h2 class="text-xl font-semibold mb-4">Récapitulatif de votre commande</h2>
-            
+
             <div x-show="cart.length === 0" class="text-center py-8">
                 <p class="text-gray-500 mb-4">Votre panier est vide</p>
                 <a href="{{ route('client.menu.index') }}" class="btn btn-primary">
@@ -61,28 +75,28 @@
                             <div class="flex-1">
                                 <h3 class="font-medium" x-text="item.nom"></h3>
                                 <p class="text-sm text-gray-600">
-                                    <span x-text="Number(item.prix).toFixed(2)"></span> € × 
+                                    <span x-text="Number(item.prix).toFixed(2)"></span> € ×
                                     <span x-text="item.quantite"></span>
                                 </p>
                             </div>
-                            
+
                             <div class="flex items-center space-x-3">
                                 <div class="flex items-center space-x-2">
-                                    <button 
-                                        @click="updateQuantity(index, -1)" 
+                                    <button
+                                        @click="updateQuantity(index, -1)"
                                         class="btn btn-sm bg-gray-200 hover:bg-gray-300 px-2 py-1"
                                     >
                                         -
                                     </button>
                                     <span class="font-medium w-8 text-center" x-text="item.quantite"></span>
-                                    <button 
-                                        @click="updateQuantity(index, 1)" 
+                                    <button
+                                        @click="updateQuantity(index, 1)"
                                         class="btn btn-sm bg-gray-200 hover:bg-gray-300 px-2 py-1"
                                     >
                                         +
                                     </button>
                                 </div>
-                                
+
                                 <p class="font-bold text-primary-600 w-20 text-right">
                                     <span x-text="(item.prix * item.quantite).toFixed(2)"></span> €
                                 </p>
@@ -105,26 +119,81 @@
 
     <!-- Formulaire de commande -->
     <div>
-        <form method="POST" action="{{ route('client.commandes.store') }}" x-show="cart.length > 0">
+        <form method="POST" action="{{ route('client.commandes.store') }}" x-show="cart.length > 0" x-ref="orderForm">
             @csrf
 
             <div class="card mb-4">
                 <h2 class="text-xl font-semibold mb-4">Informations</h2>
 
+                <!-- Nombre de personnes -->
+                <div class="mb-4">
+                    <label for="nb_personnes" class="label">Nombre de personnes *</label>
+                    <input 
+                        type="number" 
+                        id="nb_personnes" 
+                        name="nb_personnes" 
+                        min="1" 
+                        x-model="nbPersonnes"
+                        class="input @error('nb_personnes') border-red-500 @enderror"
+                        :class="{'border-red-500 text-red-600': !isCapacityValid}"
+                        required
+                    >
+                    <p x-show="!isCapacityValid && selectedTable" class="text-red-500 text-xs mt-1 font-bold">
+                        ⚠️ Dépasse la capacité de la table (<span x-text="tableCapacities[selectedTable]"></span> max)
+                    </p>
+                    @error('nb_personnes')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Sélection de la table -->
                 <div class="mb-4">
                     <label for="idTable" class="label">Table *</label>
-                    <select 
-                        id="idTable" 
-                        name="idTable" 
+                    <select
+                        id="idTable"
+                        name="idTable"
                         x-model="selectedTable"
-                        class="select @error('idTable') border-red-500 @enderror" 
+                        class="select @error('idTable') border-red-500 @enderror"
                         required
                     >
                         <option value="">Sélectionnez une table</option>
                         @foreach($tables as $table)
-                            <option value="{{ $table->idTable }}">
-                                Table {{ $table->numero }} (Capacité: {{ $table->capacite ?? '?' }})
+                            <?php
+                                // Try direct properties first
+                                $cap = $table->capacite ?? $table->CAPACITE ?? null;
+                                // If still null/empty, scan raw attributes for any key containing 'capac' (case-insensitive)
+                                if ($cap === null || $cap === '') {
+                                    $raw = $table->getAttributes();
+                                    $cap = null;
+                                    foreach ($raw as $k => $v) {
+                                        if (stripos($k, 'capac') !== false) {
+                                            $cap = $v;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if ($cap === null || $cap === '') {
+                                    $cap = '?';
+                                }
+
+                                // Numero: try various keys
+                                $tableNumero = $table->numero ?? $table->NUMERO ?? null;
+                                if ($tableNumero === null || $tableNumero === '') {
+                                    $raw = $table->getAttributes();
+                                    foreach ($raw as $k => $v) {
+                                        if (stripos($k, 'numero') !== false) {
+                                            $tableNumero = $v;
+                                            break;
+                                        }
+                                    }
+                                }
+                                $tableNumero = $tableNumero ?? '?';
+
+                                // ID: use accessor or primary key
+                                $tableId = $table->idTable ?? $table->getKey();
+                            ?>
+                            <option value="{{ $tableId }}" {{ $table->places_restantes <= 0 ? 'disabled' : '' }}>
+                                Table {{ $tableNumero }} (Cap: {{ $cap }} | Occ: {{ $table->occupants }} | Reste: {{ $table->places_restantes }})
                             </option>
                         @endforeach
                     </select>
@@ -142,14 +211,14 @@
                 <!-- Champs cachés pour les plats et boissons -->
                 <template x-for="(item, index) in cart" :key="index">
                     <div>
-                        <input 
-                            type="hidden" 
-                            :name="item.type === 'plat' ? `plats[${index}][id]` : `boissons[${index}][id]`" 
+                        <input
+                            type="hidden"
+                            :name="item.type === 'plat' ? `plats[${index}][id]` : `boissons[${index}][id]`"
                             :value="item.id"
                         >
-                        <input 
-                            type="hidden" 
-                            :name="item.type === 'plat' ? `plats[${index}][quantite]` : `boissons[${index}][quantite]`" 
+                        <input
+                            type="hidden"
+                            :name="item.type === 'plat' ? `plats[${index}][quantite]` : `boissons[${index}][quantite]`"
                             :value="item.quantite"
                         >
                     </div>
@@ -158,14 +227,16 @@
 
             <!-- Boutons d'action -->
             <div class="space-y-3">
-                <button 
-                    type="submit" 
+                <button
+                    type="button"
                     class="btn btn-primary w-full"
-                    :disabled="!selectedTable || cart.length === 0"
+                    class="btn btn-primary w-full"
+                    :class="(!selectedTable || cart.length === 0 || !isCapacityValid) ? 'opacity-50 cursor-not-allowed' : ''"
+                    @click="if(selectedTable && cart.length > 0 && isCapacityValid) { console.log('Submitting order'); $refs.orderForm.submit(); } else { console.log('Cannot submit'); }"
                 >
                     Valider la commande
                 </button>
-                
+
                 <a href="{{ route('client.menu.index') }}" class="btn btn-outline w-full block text-center">
                     Retour au menu
                 </a>

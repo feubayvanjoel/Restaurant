@@ -12,7 +12,7 @@ class HoraireReservationSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('horaire_reservation')->insert([
+        $reservations = [
             [
                 'idTable' => 10,
                 'idClient' => 1,
@@ -83,6 +83,34 @@ class HoraireReservationSeeder extends Seeder
                 'date_fin' => '2025-04-05 22:30:00',
                 'creer_le' => now(),
             ],
-        ]);
+            [
+                'idTable' => 3,
+                'idClient' => 2,
+                'statut' => 'ACTIVE',
+                'echeance' => '2025-04-05 22:30:00',
+                'nombre_personne' => 2,
+                'date_debut' => '2025-04-05 20:30:00',
+                'date_fin' => '2025-04-05 22:30:00',
+                'creer_le' => now(),
+            ],
+        ];
+
+        DB::table('horaire_reservation')->insert($reservations);
+
+        // Update tables to 'Reservee' for ACTIVE reservations 
+        // Note: In a real scenario we'd check dates, but for seeding we assume active means "now"
+        $reservedTableIds = collect($reservations)
+            ->where('statut', 'ACTIVE')
+            ->pluck('idTable')
+            ->unique();
+
+        // Only update if not already Occupied (Occupied takes precedence usually, or Reservee depending on logic)
+        // Here we just set them to Reservee if not occupied
+        foreach ($reservedTableIds as $id) {
+            $table = DB::table('gestion_salle')->where('IDTABLE', $id)->first();
+            if ($table && $table->STATUT !== 'Occupee') {
+                DB::table('gestion_salle')->where('IDTABLE', $id)->update(['STATUT' => 'Reservee']);
+            }
+        }
     }
 }

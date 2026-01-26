@@ -12,7 +12,7 @@ class Plat extends Model
     protected $table = 'plats';
     protected $primaryKey = 'IDPLATS';
     public $timestamps = false; // Répété pour sûreté si overwrite
-    
+
     // Fillable en minuscule pour le code, mais les mutators feront le mapping
     protected $fillable = [
         'nom',
@@ -27,6 +27,11 @@ class Plat extends Model
     ];
 
     // --- Accessors (Lecture) ---
+    public function getIdPlatsAttribute($value)
+    {
+        return $this->attributes['IDPLATS'] ?? $this->attributes['idPlats'] ?? $value;
+    }
+
     public function getNomAttribute($value)
     {
         return $this->attributes['nom'] ?? $this->attributes['NOM'] ?? $value;
@@ -46,18 +51,15 @@ class Plat extends Model
     public function setNomAttribute($value)
     {
         $this->attributes['NOM'] = $value;
-        $this->attributes['nom'] = $value; // Garder synchro si besoin
     }
 
     public function setPrixAttribute($value)
     {
         $this->attributes['PRIX'] = $value;
-        $this->attributes['prix'] = $value;
     }
 
     public function setQuantiteAttribute($value)
     {
         $this->attributes['QUANTITE'] = $value;
-        $this->attributes['quantite'] = $value;
     }
 }

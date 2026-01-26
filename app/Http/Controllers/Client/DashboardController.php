@@ -65,4 +65,54 @@ class DashboardController extends Controller
             'historiqueReservations'
         ));
     }
+
+    /**
+     * Rafraîchir les données du dashboard (API JSON)
+     */
+    public function refresh()
+    {
+        $compte = auth()->user();
+        $client = Client::find($compte->idProprietaire);
+
+        if (!$client) {
+            return response()->json(['error' => 'Client introuvable'], 404);
+        }
+
+        // Récupérer les commandes en cours
+        $commandesEnCours = $client->commandes()
+            ->whereNotIn('statut', ['Terminee', 'Annulee', 'Supprimee'])
+            ->with(['ticket', 'table'])
+            ->orderBy('horaire', 'desc')
+            ->get();
+
+        // Récupérer les réservations actives
+        $reservationsEnCours = $client->reservations()
+            ->where('statut', 'ACTIVE')
+            ->with('table')
+            ->orderBy('date_debut', 'asc')
+            ->get();
+
+        // Récupérer l'historique des commandes
+        $historiqueCommandes = $client->commandes()
+            ->where('statut', 'Terminee')
+            ->with(['ticket', 'table'])
+            ->orderBy('horaire', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Récupérer l'historique des réservations
+        $historiqueReservations = $client->reservations()
+            ->whereIn('statut', ['TERNINEE', 'ANNULEE'])
+            ->with('table')
+            ->orderBy('date_debut', 'desc')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'commandesEnCours' => $commandesEnCours,
+            'reservationsEnCours' => $reservationsEnCours,
+            'historiqueCommandes' => $historiqueCommandes,
+            'historiqueReservations' => $historiqueReservations,
+        ]);
+    }
 }

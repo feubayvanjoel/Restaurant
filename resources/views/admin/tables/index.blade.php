@@ -1,15 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Gestion des Tables')
+@section('title', 'Gestion des Tables (Admin)')
 
 @section('content')
 <div class="mb-6">
     <div class="flex justify-between items-center">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Gestion des Tables</h1>
-            <p class="text-gray-600">Gérez le statut des tables</p>
-        </div>
-        <a href="{{ route('serveur.dashboard') }}" class="btn btn-outline mr-2">
+            <p class="text-gray-600">Supervision et modification des statuts</p>
+        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline mr-2">
             ← Retour
         </a>
         <button x-data @click="$dispatch('open-create-table-modal')" class="btn btn-primary">
@@ -37,7 +36,8 @@
 </div>
 
 <!-- Plan des tables interactif -->
-    <h2 class="text-xl font-semibold mb-6">Plan Interactif</h2>
+<div class="card">
+    <h2 class="text-xl font-semibold mb-6">Plan Interactif (Admin)</h2>
     
     <div id="table-management-grid">
         @include('partials.tables_grid', ['tables' => $tables, 'showActions' => true])
@@ -49,12 +49,12 @@
     document.addEventListener('DOMContentLoaded', function() {
         const gridWrapper = document.getElementById('table-management-grid');
         setInterval(() => {
-            fetch('{{ route('serveur.tables.refresh') }}?showActions=1')
+            fetch('{{ route('admin.tables.refresh') }}?showActions=1')
                 .then(response => response.text())
                 .then(html => {
                     gridWrapper.innerHTML = html;
                 })
-                .catch(err => console.error('Erreur actualisation tables:', err));
+                .catch(err => console.error('Erreur refresh tables admin:', err));
         }, 2000);
     });
 </script>

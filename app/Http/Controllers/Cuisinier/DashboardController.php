@@ -24,13 +24,13 @@ class DashboardController extends Controller
             ->get();
 
         // Commandes en cours de préparation
-        $commandesEnCours = Commande::where('statut', 'En cours')
+        $commandesEnCours = Commande::where('statut', 'En préparation')
             ->with(['client', 'table', 'composer.plat', 'contenir.boisson'])
             ->orderBy('horaire', 'asc')
             ->get();
 
         // Commandes prêtes (pour info)
-        $commandesPrete = Commande::where('statut', 'Prete')
+        $commandesPrete = Commande::where('statut', 'Préparée')
             ->with(['client', 'table', 'composer.plat', 'contenir.boisson'])
             ->orderBy('horaire', 'asc')
             ->limit(10)
@@ -41,7 +41,7 @@ class DashboardController extends Controller
             'total_jour' => Commande::whereDate('horaire', today())->count(),
             'en_attente' => $commandesEnAttente->count(),
             'en_cours' => $commandesEnCours->count(),
-            'pretes' => Commande::where('statut', 'Prete')->whereDate('horaire', today())->count(),
+            'pretes' => Commande::where('statut', 'Préparée')->whereDate('horaire', today())->count(),
         ];
 
         return view('cuisinier.dashboard', compact(

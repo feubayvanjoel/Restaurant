@@ -55,6 +55,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Actions Avancées Tables (Partagées : Admin & Serveur)
+    Route::get('/tables/{id}/eligible-orders', [App\Http\Controllers\TableActionController::class, 'getEligibleOrders'])->name('tables.eligible');
+    Route::post('/tables/{id}/assign', [App\Http\Controllers\TableActionController::class, 'assignOrder'])->name('tables.assign');
+    Route::post('/tables/{id}/checkout', [App\Http\Controllers\TableActionController::class, 'freeTable'])->name('tables.checkout');
+    Route::post('/tables', [App\Http\Controllers\TableActionController::class, 'store'])->name('tables.store');
 });
 
 /*
@@ -97,7 +103,16 @@ Route::middleware(['auth', 'role:ADMIN'])->prefix('admin')->name('admin.')->grou
     Route::put('/stock/boissons/{boisson}', [App\Http\Controllers\Admin\StockController::class, 'updateBoissonStock'])->name('stock.boissons.update');
     
     // Rapports
+    // Rapports
     Route::get('/reports', [App\Http\Controllers\Admin\ReportsController::class, 'index'])->name('reports.index');
+
+    // Actualisation silencieuse (Admin aussi)
+    Route::get('/tables/refresh', [App\Http\Controllers\TableStatusController::class, 'refresh'])->name('tables.refresh');
+    
+    // Gestion des Tables (Admin)
+    Route::get('/tables', [App\Http\Controllers\Admin\TableManagementController::class, 'index'])->name('tables.index');
+    
+
 });
 
 /*
@@ -121,6 +136,9 @@ Route::middleware(['auth', 'role:CLIENT'])->prefix('client')->name('client.')->g
     Route::get('/commandes/{commande}', [App\Http\Controllers\Client\CommandeController::class, 'show'])->name('commandes.show');
     Route::get('/commandes/{commande}/ticket', [App\Http\Controllers\Client\CommandeController::class, 'downloadTicket'])->name('commandes.ticket');
     Route::post('/commandes/{commande}/cancel', [App\Http\Controllers\Client\CommandeController::class, 'cancel'])->name('commandes.cancel');
+    Route::post('/commandes/{commande}/complete', [App\Http\Controllers\Client\CommandeController::class, 'markAsCompleted'])->name('commandes.complete');
+    Route::post('/commandes/{commande}/pay-card', [App\Http\Controllers\Client\CommandeController::class, 'payCard'])->name('commandes.pay-card');
+    Route::post('/commandes/{commande}/pay-cash-request', [App\Http\Controllers\Client\CommandeController::class, 'payCashRequest'])->name('commandes.pay-cash-request');
     
     // Réservations
     Route::get('/reservations', [App\Http\Controllers\Client\ReservationController::class, 'index'])->name('reservations.index');
@@ -129,6 +147,13 @@ Route::middleware(['auth', 'role:CLIENT'])->prefix('client')->name('client.')->g
     Route::get('/reservations/{reservation}', [App\Http\Controllers\Client\ReservationController::class, 'show'])->name('reservations.show');
     Route::post('/reservations/check-availability', [App\Http\Controllers\Client\ReservationController::class, 'checkAvailability'])->name('reservations.check');
     Route::post('/reservations/{reservation}/cancel', [App\Http\Controllers\Client\ReservationController::class, 'cancel'])->name('reservations.cancel');
+    
+    // API Routes pour rafraîchissement silencieux
+    Route::get('/api/dashboard-refresh', [App\Http\Controllers\Client\DashboardController::class, 'refresh'])->name('api.dashboard.refresh');
+    Route::get('/api/commandes-refresh', [App\Http\Controllers\Client\CommandeController::class, 'refreshList'])->name('api.commandes.refresh');
+    Route::get('/api/commandes/{commande}/refresh', [App\Http\Controllers\Client\CommandeController::class, 'refreshDetails'])->name('api.commandes.refresh-details');
+    Route::get('/api/reservations-refresh', [App\Http\Controllers\Client\ReservationController::class, 'refreshList'])->name('api.reservations.refresh');
+    Route::get('/api/reservations/{reservation}/refresh', [App\Http\Controllers\Client\ReservationController::class, 'refreshDetails'])->name('api.reservations.refresh-details');
 });
 
 /*
@@ -144,6 +169,7 @@ Route::middleware(['auth', 'role:CAISSIER'])->prefix('caissier')->name('caissier
     Route::get('/encaissements', [App\Http\Controllers\Caissier\EncaissementController::class, 'index'])->name('encaissements.index');
     Route::get('/encaissements/{commande}', [App\Http\Controllers\Caissier\EncaissementController::class, 'show'])->name('encaissements.show');
     Route::post('/encaissements/{commande}/process', [App\Http\Controllers\Caissier\EncaissementController::class, 'process'])->name('encaissements.process');
+    Route::post('/encaissements/{commande}/validate', [App\Http\Controllers\Caissier\EncaissementController::class, 'validatePayment'])->name('encaissements.validate'); // New
     Route::get('/encaissements-history', [App\Http\Controllers\Caissier\EncaissementController::class, 'history'])->name('encaissements.history');
 });
 
@@ -166,6 +192,8 @@ Route::middleware(['auth', 'role:SERVEUR'])->prefix('serveur')->name('serveur.')
     Route::put('/tables/{table}/status', [App\Http\Controllers\Serveur\TableController::class, 'updateStatus'])->name('tables.update-status');
     Route::post('/tables/{table}/free', [App\Http\Controllers\Serveur\TableController::class, 'markAsFree'])->name('tables.free');
     Route::post('/tables/{table}/occupied', [App\Http\Controllers\Serveur\TableController::class, 'markAsOccupied'])->name('tables.occupied');
+    // Actualisation silencieuse
+    Route::get('/tables/refresh', [App\Http\Controllers\TableStatusController::class, 'refresh'])->name('tables.refresh');
 });
 
 /*

@@ -17,11 +17,11 @@ class CommandeController extends Controller
      */
     public function markAsServed(Commande $commande)
     {
-        if ($commande->statut !== 'Prete') {
+        if ($commande->statut !== 'Préparée') {
             return back()->withErrors(['error' => 'Cette commande n\'est pas prête.']);
         }
 
-        $commande->update(['statut' => 'Servie']);
+        $commande->update(['STATUT' => 'Servie']);
 
         return back()->with('success', 'Commande servie !');
     }
@@ -41,7 +41,7 @@ class CommandeController extends Controller
      */
     public function index()
     {
-        $commandesPrete = Commande::where('statut', 'Prete')
+        $commandesPrete = Commande::where('statut', 'Préparée')
             ->with(['client', 'table', 'composer.plat', 'contenir.boisson'])
             ->orderBy('horaire', 'asc')
             ->get();

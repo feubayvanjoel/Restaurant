@@ -174,4 +174,36 @@ class ReservationController extends Controller
 
         return back()->with('success', 'Réservation annulée avec succès.');
     }
+
+    /**
+     * Rafraîchir la liste des réservations (API JSON)
+     */
+    public function refreshList()
+    {
+        $compte = auth()->user();
+        $client = Client::find($compte->idProprietaire);
+
+        $reservations = $client->reservations()
+            ->where('statut', '!=', 'SUPPRIMEE')
+            ->with('table')
+            ->orderBy('date_debut', 'desc')
+            ->get();
+
+        return response()->json(['reservations' => $reservations]);
+    }
+
+    /**
+     * Rafraîchir les détails d'une réservation (API JSON)
+     */
+    public function refreshDetails(HoraireReservation $reservation)
+    {
+        $compte = auth()->user();
+        if ($reservation->idClient !== $compte->idProprietaire) {
+            return response()->json(['error' => 'Non autorisé'], 403);
+        }
+
+        $reservation->load('table');
+
+        return response()->json(['reservation' => $reservation]);
+    }
 }

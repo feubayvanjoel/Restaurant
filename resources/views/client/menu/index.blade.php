@@ -73,7 +73,7 @@
 
                             <button
                                 type="button"
-                                @click='addToCart({{ json_encode(["id" => $plat->idPlats, "nom" => $plat->nom, "prix" => $plat->prix, "type" => "plat"]) }})'
+                                @click="addToCart({{ json_encode(['id' => $plat->idPlats, 'nom' => $plat->nom, 'prix' => $plat->prix, 'type' => 'plat']) }})"
                                 class="btn btn-primary w-full"
                             >
                                 Ajouter au panier
@@ -116,7 +116,7 @@
 
                             <button
                                 type="button"
-                                @click='addToCart({{ json_encode(["id" => $boisson->idBoissons, "nom" => $boisson->nom, "prix" => $boisson->prix, "type" => "boisson"]) }})'
+                                @click="addToCart({{ json_encode(['id' => $boisson->idBoissons, 'nom' => $boisson->nom, 'prix' => $boisson->prix, 'type' => 'boisson']) }})"
                                 class="btn btn-primary w-full"
                             >
                                 Ajouter au panier

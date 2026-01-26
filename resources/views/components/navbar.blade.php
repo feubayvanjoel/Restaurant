@@ -55,7 +55,7 @@
                     </div>
 
                     <!-- Dropdown menu -->
-                    <div x-show="open" 
+                    <div x-show="open"
                          @click.away="open = false"
                          x-transition
                          class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5">

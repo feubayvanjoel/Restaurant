@@ -3,6 +3,7 @@
 @section('title', 'Cuisine - Commandes')
 
 @section('content')
+<div id="cuisinier-dashboard-content">
 <div class="mb-6">
     <div class="flex justify-between items-center">
         <div>
@@ -44,7 +45,7 @@
                     <div class="flex justify-between items-start mb-3">
                         <div>
                             <h3 class="font-bold text-lg">Commande #{{ $commande->idCommande }}</h3>
-                            <p class="text-xs text-gray-600">Table {{ $commande->table->numero ?? 'N/A' }}</p>
+                            <p class="text-xs text-gray-600">Table {{ $commande->table->numero ?? 'N/A' }} ({{ $commande->table->capacite ?? '?' }} pers.)</p>
                         </div>
                         <span class="text-xs text-gray-500">
                             {{ \Carbon\Carbon::parse($commande->horaire)->format('H:i') }}
@@ -100,10 +101,10 @@
                     <div class="flex justify-between items-start mb-3">
                         <div>
                             <h3 class="font-bold text-lg">Commande #{{ $commande->idCommande }}</h3>
-                            <p class="text-xs text-gray-600">Table {{ $commande->table->numero ?? 'N/A' }}</p>
+                            <p class="text-xs text-gray-600">Table {{ $commande->table->numero ?? 'N/A' }} ({{ $commande->table->capacite ?? '?' }} pers.)</p>
                         </div>
                         <span class="text-xs text-blue-600 font-medium">
-                            En cours...
+                            En préparation...
                         </span>
                     </div>
 
@@ -156,7 +157,7 @@
                     <div class="flex justify-between items-start mb-3">
                         <div>
                             <h3 class="font-bold text-lg">Commande #{{ $commande->idCommande }}</h3>
-                            <p class="text-xs text-gray-600">Table {{ $commande->table->numero ?? 'N/A' }}</p>
+                            <p class="text-xs text-gray-600">Table {{ $commande->table->numero ?? 'N/A' }} ({{ $commande->table->capacite ?? '?' }} pers.)</p>
                         </div>
                         <span class="badge badge-success">Prête</span>
                     </div>
@@ -187,21 +188,32 @@
     </div>
 </div>
 
-<!-- Actualisation automatique -->
-<div class="mt-6 text-center text-sm text-gray-600">
-    <p>🔄 Actualisation automatique toutes les 30 secondes</p>
-</div>
+</div> {{-- Close Kanban Wrapper --}}
+</div> {{-- Close Main Wrapper --}}
 @endsection
 
 @push('scripts')
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dashboardContent = document.getElementById('cuisinier-dashboard-content');
+        
+        setInterval(() => {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.getElementById('cuisinier-dashboard-content').innerHTML;
+                    dashboardContent.innerHTML = newContent;
+                })
+                .catch(err => console.error('Erreur refresh cuisinier:', err));
+        }, 2000);
+    });
+
     function commandesKanban() {
         return {
             init() {
-                // Actualisation auto toutes les 30 secondes
-                setInterval(() => {
-                    window.location.reload();
-                }, 30000);
+                // Alpine init if needed
             }
         }
     }

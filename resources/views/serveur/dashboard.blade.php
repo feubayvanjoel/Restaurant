@@ -70,27 +70,10 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Plan des tables -->
     <div class="card">
-<h2 class="text-xl font-semibold mb-4">Plan des Tables</h2>
+<h2 class="text-xl font-semibold mb-4">Plan des Tables (Avec Actions)</h2>
         
-        <div class="grid grid-cols-4 gap-3">
-            @foreach($tables as $table)
-                <a href="{{ route('serveur.tables.index') }}" 
-                   class="p-4 rounded-lg text-center font-semibold transition hover:shadow-lg
-                          @if($table->statut === 'Libre') bg-green-100 border-2 border-green-400 text-green-900
-                          @elseif($table->statut === 'Occupee') bg-orange-100 border-2 border-orange-400 text-orange-900
-                          @else bg-blue-100 border-2 border-blue-400 text-blue-900
-                          @endif">
-                    <div class="text-2xl mb-1">
-                        @if($table->statut === 'Libre') 🟢
-                        @elseif($table->statut === 'Occupee') 🟠
-                        @else 🔵
-                        @endif
-                    </div>
-                    <p class="text-lg">Table {{ $table->numero ?? 'N/A' }}</p>
-                    <p class="text-xs">{{ $table->capacite }} pers.</p>
-                    <p class="text-xs font-medium mt-1">{{ $table->statut }}</p>
-                </a>
-            @endforeach
+        <div id="table-grid-wrapper">
+            @include('partials.tables_grid', ['tables' => $tables, 'showActions' => true])
         </div>
     </div>
 
@@ -138,17 +121,23 @@
     </div>
 </div>
 
-<!-- Actualisation automatique -->
-<div class="mt-6 text-center text-sm text-gray-600">
-    <p>🔄 Actualisation automatique toutes les 30 secondes</p>
-</div>
+@include('partials.table_management_modals')
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
-    // Actualisation auto toutes les 30 secondes
-    setInterval(() => {
-        window.location.reload();
-    }, 30000);
+    document.addEventListener('DOMContentLoaded', function() {
+        const gridWrapper = document.getElementById('table-grid-wrapper');
+        
+        // Actualisation silencieuse toutes les 2 secondes
+        setInterval(() => {
+            fetch('{{ route('serveur.tables.refresh') }}?showActions=1')
+                .then(response => response.text())
+                .then(html => {
+                    gridWrapper.innerHTML = html;
+                })
+                .catch(err => console.error('Erreur actualisation tables:', err));
+        }, 2000); 
+    });
 </script>
-@endpush
+@endsection

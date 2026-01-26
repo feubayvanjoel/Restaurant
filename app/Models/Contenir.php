@@ -15,10 +15,41 @@ class Contenir extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'idCommande',
-        'idBoissons',
-        'quantite',
+        'IDCOMMANDE',
+        'IDBOISSONS',
+        'NBBOISSONS',
     ];
+
+    // Accesseurs pour mapper les noms camelCase aux noms UPPERCASE
+    public function setIdCommandeAttribute($value)
+    {
+        $this->attributes['IDCOMMANDE'] = $value;
+    }
+
+    public function getIdCommandeAttribute()
+    {
+        return $this->attributes['IDCOMMANDE'] ?? null;
+    }
+
+    public function setIdBoissonsAttribute($value)
+    {
+        $this->attributes['IDBOISSONS'] = $value;
+    }
+
+    public function getIdBoissonsAttribute()
+    {
+        return $this->attributes['IDBOISSONS'] ?? null;
+    }
+
+    public function setQuantiteAttribute($value)
+    {
+        $this->attributes['NBBOISSONS'] = $value;
+    }
+
+    public function getQuantiteAttribute()
+    {
+        return $this->attributes['NBBOISSONS'] ?? null;
+    }
 
     public function commande(): BelongsTo
     {

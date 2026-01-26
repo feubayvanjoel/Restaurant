@@ -85,8 +85,8 @@
                     >
                         <option value="">Sélectionnez une table</option>
                         @foreach($tables as $table)
-                            <option value="{{ $table->idTable }}">
-                                Table {{ $table->numero }} (Capacité: {{ $table->capacite ?? '?' }} personnes)
+                            <option value="{{ $table->idTable }}" {{ $table->places_restantes <= 0 ? 'disabled' : '' }}>
+                                Table {{ $table->numero }} (Cap: {{ $table->capacite }} | Occ: {{ $table->occupants }} | Reste: {{ $table->places_restantes }})
                             </option>
                         @endforeach
                     </select>
